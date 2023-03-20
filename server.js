@@ -45,20 +45,22 @@ app.post("/login", async (req,res) => {
     .then(result => {
         var count = Object.keys(result).length
         if (count == 0) {
-            // return res.status(400).send('cannot find user')
-            return res.render("fail.ejs")
-        }
-        dbEncryption = result[0].password
-    })
-    //compare
-    try {
-        if (await bcrypt.compare(req.body.password, dbEncryption)){
-            res.render("start.ejs")
-            //create a jwt token save in a string and logged 
-            const token = jwt.sign(req.body.username, process.env.TOKEN)
-            console.log(token);
-        } else {
             res.render("fail.ejs")
+        } else {
+            dbEncryption = result[0].password
+        }
+    })
+    // compare
+    try {
+        if (dbEncryption != null) {
+            if (await bcrypt.compare(req.body.password, dbEncryption)){
+                res.render("start.ejs")
+                // create a jwt token save in a string and logged 
+                const token = jwt.sign(req.body.username, process.env.TOKEN)
+                console.log(token);
+            } else {
+                res.render("fail.ejs")
+            }   
         }
     } catch (error) {
         console.log(error);
